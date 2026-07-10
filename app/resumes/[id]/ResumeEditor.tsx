@@ -28,6 +28,18 @@ type Resume = {
 export default function ResumeEditor({ initialResume }: { initialResume: Resume }) {
   const [resume, setResume] = useState(initialResume);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [titleSaving, setTitleSaving] = useState(false);
+
+  async function updateTitle(title: string) {
+    setResume((prev) => ({ ...prev, title }));
+    setTitleSaving(true);
+    await fetch(`/api/resumes/${resume.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title }),
+    });
+    setTitleSaving(false);
+  }
 
   function getSection(type: string) {
     return resume.sections.find((s) => s.type === type);
@@ -98,7 +110,14 @@ export default function ResumeEditor({ initialResume }: { initialResume: Resume 
           <Link href="/dashboard" className="text-sm text-gray-600 hover:underline">
             ← Back to Dashboard
           </Link>
-          <p className="text-sm text-gray-400">{savingId ? 'Saving...' : 'All changes saved'}</p>
+          <input
+            value={resume.title}
+            onChange={(e) => updateTitle(e.target.value)}
+            className="mx-4 flex-1 rounded-md border border-transparent px-2 py-1 text-center text-sm font-medium text-gray-900 hover:border-gray-300 focus:border-blue-500 focus:outline-none"
+          />
+          <p className="text-sm text-gray-400">
+            {savingId || titleSaving ? 'Saving...' : 'All changes saved'}
+          </p>
         </div>
       </header>
 
@@ -322,22 +341,24 @@ export default function ResumeEditor({ initialResume }: { initialResume: Resume 
                 <h2 className="mb-2 border-b border-gray-300 pb-1 text-sm font-semibold uppercase tracking-wide text-gray-700">
                   Experience
                 </h2>
-                {experienceSection.entries.map((entry) => (
-                  <div key={entry.id} className="mb-3">
-                    <div className="flex items-baseline justify-between">
-                      <p className="font-medium text-gray-900">
-                        {entry.content.role || 'Role'}
-                        {entry.content.company && ` · ${entry.content.company}`}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {entry.content.startDate} – {entry.content.endDate || 'Present'}
-                      </p>
+                {experienceSection.entries
+                  .filter((entry) => entry.content.role || entry.content.company)
+                  .map((entry) => (
+                    <div key={entry.id} className="mb-3">
+                      <div className="flex items-baseline justify-between">
+                        <p className="font-medium text-gray-900">
+                          {entry.content.role}
+                          {entry.content.company && ` · ${entry.content.company}`}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {entry.content.startDate} – {entry.content.endDate || 'Present'}
+                        </p>
+                      </div>
+                      {entry.content.description && (
+                        <p className="mt-1 text-sm text-gray-700">{entry.content.description}</p>
+                      )}
                     </div>
-                    {entry.content.description && (
-                      <p className="mt-1 text-sm text-gray-700">{entry.content.description}</p>
-                    )}
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
 
@@ -346,19 +367,21 @@ export default function ResumeEditor({ initialResume }: { initialResume: Resume 
                 <h2 className="mb-2 border-b border-gray-300 pb-1 text-sm font-semibold uppercase tracking-wide text-gray-700">
                   Education
                 </h2>
-                {educationSection.entries.map((entry) => (
-                  <div key={entry.id} className="mb-3">
-                    <div className="flex items-baseline justify-between">
-                      <p className="font-medium text-gray-900">
-                        {entry.content.degree || 'Degree'}
-                        {entry.content.school && ` · ${entry.content.school}`}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {entry.content.startDate} – {entry.content.endDate || 'Present'}
-                      </p>
+                {educationSection.entries
+                  .filter((entry) => entry.content.degree || entry.content.school)
+                  .map((entry) => (
+                    <div key={entry.id} className="mb-3">
+                      <div className="flex items-baseline justify-between">
+                        <p className="font-medium text-gray-900">
+                          {entry.content.degree}
+                          {entry.content.school && ` · ${entry.content.school}`}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {entry.content.startDate} – {entry.content.endDate || 'Present'}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
 
