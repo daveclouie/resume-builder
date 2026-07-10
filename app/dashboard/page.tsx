@@ -2,6 +2,7 @@ import { auth, signOut } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import CreateResumeButton from './CreateResumeButton';
+import DeleteResumeButton from './DeleteResumeButton';
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -44,16 +45,17 @@ export default async function DashboardPage() {
         ) : (
           <ul className="mt-6 space-y-3">
             {resumes.map((resume) => (
-              <li key={resume.id}>
-                <Link
-                  href={`/resumes/${resume.id}`}
-                  className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-400 hover:shadow-md"
-                >
+              <li
+                key={resume.id}
+                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:border-blue-400 hover:shadow-md"
+              >
+                <Link href={`/resumes/${resume.id}`} className="flex-1">
                   <p className="font-medium text-gray-900">{resume.title}</p>
                   <p className="text-xs text-gray-500">
                     Last updated {new Date(resume.updatedAt).toLocaleDateString()}
                   </p>
                 </Link>
+                <DeleteResumeButton resumeId={resume.id} />
               </li>
             ))}
           </ul>

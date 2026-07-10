@@ -118,6 +118,12 @@ export default function ResumeEditor({ initialResume }: { initialResume: Resume 
           <p className="text-sm text-gray-400">
             {savingId || titleSaving ? 'Saving...' : 'All changes saved'}
           </p>
+          <button
+            onClick={() => window.print()}
+            className="ml-4 rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700"
+          >
+            Download PDF
+          </button>
         </div>
       </header>
 
@@ -322,7 +328,10 @@ export default function ResumeEditor({ initialResume }: { initialResume: Resume 
 
         {/* RIGHT: LIVE PREVIEW */}
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          <div
+            className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm"
+            id="resume-preview"
+          >
             <h1 className="text-2xl font-bold text-gray-900">
               {contactEntry?.content.fullName || 'Your Name'}
             </h1>
