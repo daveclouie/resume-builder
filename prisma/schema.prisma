@@ -23,13 +23,14 @@ model User {
 }
 
 model Resume {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String    @default("Untitled Resume")
-  sections  Section[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String        @default("Untitled Resume")
+  sections     Section[]
+  coverLetters CoverLetter[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Section {
@@ -52,4 +53,15 @@ model Entry {
   content   Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model CoverLetter {
+  id              String   @id @default(cuid())
+  resumeId        String
+  resume          Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobTitle        String
+  jobDescription  String
+  content         String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

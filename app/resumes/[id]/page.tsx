@@ -21,5 +21,15 @@ export default async function ResumePage({ params }: { params: Promise<{ id: str
     notFound();
   }
 
-  return <ResumeEditor initialResume={resume} />;
+  const coverLetters = await prisma.coverLetter.findMany({
+    where: { resumeId: id },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return (
+    <ResumeEditor
+      initialResume={resume}
+      initialCoverLetters={JSON.parse(JSON.stringify(coverLetters))}
+    />
+  );
 }

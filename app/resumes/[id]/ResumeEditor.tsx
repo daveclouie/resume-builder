@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import CoverLetters from './CoverLetters';
 
 type EntryContent = Record<string, string>;
 
@@ -25,7 +26,21 @@ type Resume = {
   sections: Section[];
 };
 
-export default function ResumeEditor({ initialResume }: { initialResume: Resume }) {
+type CoverLetter = {
+  id: string;
+  jobTitle: string;
+  jobDescription: string;
+  content: string;
+  createdAt: string;
+};
+
+export default function ResumeEditor({
+  initialResume,
+  initialCoverLetters,
+}: {
+  initialResume: Resume;
+  initialCoverLetters: CoverLetter[];
+}) {
   const [resume, setResume] = useState(initialResume);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [titleSaving, setTitleSaving] = useState(false);
@@ -405,6 +420,8 @@ export default function ResumeEditor({ initialResume }: { initialResume: Resume 
           </div>
         </div>
       </div>
+
+      <CoverLetters resumeId={resume.id} initialCoverLetters={initialCoverLetters} />
     </div>
   );
 }
