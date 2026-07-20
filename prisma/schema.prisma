@@ -23,14 +23,15 @@ model User {
 }
 
 model Resume {
-  id           String        @id @default(cuid())
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title        String        @default("Untitled Resume")
-  sections     Section[]
-  coverLetters CoverLetter[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String         @default("Untitled Resume")
+  sections      Section[]
+  coverLetters  CoverLetter[]
+  atsAnalyses   AtsAnalysis[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Section {
@@ -56,12 +57,25 @@ model Entry {
 }
 
 model CoverLetter {
+  id             String   @id @default(cuid())
+  resumeId       String
+  resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  jobTitle       String
+  jobDescription String
+  content        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model AtsAnalysis {
   id              String   @id @default(cuid())
   resumeId        String
   resume          Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   jobTitle        String
   jobDescription  String
-  content         String
+  score           Int
+  matchedKeywords Json
+  missingKeywords Json
+  suggestions     Json
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
