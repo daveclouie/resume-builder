@@ -1,14 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { GoogleGenAI } from '@google/genai';
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-// Google periodically retires older model names — if generation starts failing
-// with a 404 "no longer available" error, check https://ai.google.dev/gemini-api/docs/models
-// for the current model name and update this one constant.
-const GEMINI_MODEL = 'gemini-3.5-flash';
+import { ai, GROQ_MODEL } from '@/lib/ai';
 
 type EntryContent = Record<string, string>;
 
@@ -112,9 +105,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   };
 
   try {
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: `You are an ATS (Applicant Tracking System) resume analyzer. Compare this resume against the job description and respond with ONLY valid JSON, no other text, in exactly this shape:
+    const completion = await ai.chat.completions.create({
+      model: GROQ_MODEL,
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          role: 'user',
+          content: `You are an ATS (Applicant Tracking System) resume analyzer. Compare this resume against the job description and respond with ONLY valid JSON, no other text, in exactly this shape:
 
 {
   "score": <number 0-100 representing how well the resume matches the job>,
@@ -130,9 +127,11 @@ ${jobDescription}
 
 Resume Summary:
 ${resumeSummary}`,
+        },
+      ],
     });
 
-    const text = (response.text ?? '').trim();
+    const text = (completion.choices[0]?.message?.content ?? '').trim();
     const jsonText = text.replace(/^```json\s*|\s*```$/g, '');
     parsed = JSON.parse(jsonText);
   } catch (err) {

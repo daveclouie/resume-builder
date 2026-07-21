@@ -1,6 +1,7 @@
-import { GoogleGenAI } from '@google/genai';
+import Groq from 'groq-sdk';
 
-export const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+export const ai = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// Update this when Google retires the current model generation.
-export const GEMINI_MODEL = 'gemini-3.5-flash';
+// Groq occasionally updates available model names — if generation starts failing,
+// check https://console.groq.com/docs/models for the current model name.
+export const GROQ_MODEL = 'llama-3.3-70b-versatile';

@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { ai, GEMINI_MODEL } from '@/lib/ai';
-
-// Google periodically retires older model names — if generation starts failing
-// with a 404 "no longer available" error, check https://ai.google.dev/gemini-api/docs/models
-// for the current model name and update this one constant.
-const GEMINI_MODEL = 'gemini-3.5-flash';
+import { ai, GROQ_MODEL } from '@/lib/ai';
 
 type EntryContent = Record<string, string>;
 
@@ -105,9 +100,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   let content: string;
 
   try {
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: `Write a professional cover letter for this job application. Be specific and connect the candidate's real experience to the role — don't use generic filler phrases.
+    const completion = await ai.chat.completions.create({
+      model: GROQ_MODEL,
+      messages: [
+        {
+          role: 'user',
+          content: `Write a professional cover letter for this job application. Be specific and connect the candidate's real experience to the role — don't use generic filler phrases.
 
 Job Title: ${jobTitle}
 
@@ -118,15 +116,17 @@ Candidate's Resume Summary:
 ${resumeSummary}
 
 Write only the cover letter text, no preamble or explanation. Keep it to 3-4 paragraphs.`,
+        },
+      ],
     });
 
-    content = response.text ?? '';
+    content = completion.choices[0]?.message?.content ?? '';
 
     if (!content) {
-      throw new Error('Empty response from Gemini');
+      throw new Error('Empty response from Groq');
     }
   } catch (err) {
-    console.error('Gemini generation error:', err);
+    console.error('Groq generation error:', err);
     return NextResponse.json(
       { error: 'Failed to generate cover letter. Please try again.' },
       { status: 500 }
