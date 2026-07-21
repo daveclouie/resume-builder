@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import CoverLetters from './CoverLetters';
+import AtsAnalysisSection from './AtsAnalysisSection';
 
 type EntryContent = Record<string, string>;
 
@@ -34,12 +35,25 @@ type CoverLetter = {
   createdAt: string;
 };
 
+type AtsAnalysisItem = {
+  id: string;
+  jobTitle: string;
+  jobDescription: string;
+  score: number;
+  matchedKeywords: string[];
+  missingKeywords: string[];
+  suggestions: string[];
+  createdAt: string;
+};
+
 export default function ResumeEditor({
   initialResume,
   initialCoverLetters,
+  initialAtsAnalyses,
 }: {
   initialResume: Resume;
   initialCoverLetters: CoverLetter[];
+  initialAtsAnalyses: AtsAnalysisItem[];
 }) {
   const [resume, setResume] = useState(initialResume);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -422,6 +436,7 @@ export default function ResumeEditor({
       </div>
 
       <CoverLetters resumeId={resume.id} initialCoverLetters={initialCoverLetters} />
+      <AtsAnalysisSection resumeId={resume.id} initialAnalyses={initialAtsAnalyses} />
     </div>
   );
 }

@@ -26,10 +26,16 @@ export default async function ResumePage({ params }: { params: Promise<{ id: str
     orderBy: { createdAt: 'desc' },
   });
 
+  const atsAnalyses = await prisma.atsAnalysis.findMany({
+    where: { resumeId: id },
+    orderBy: { createdAt: 'desc' },
+  });
+
   return (
     <ResumeEditor
       initialResume={resume}
       initialCoverLetters={JSON.parse(JSON.stringify(coverLetters))}
+      initialAtsAnalyses={JSON.parse(JSON.stringify(atsAnalyses))}
     />
   );
 }
