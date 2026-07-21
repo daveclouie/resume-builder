@@ -33,7 +33,7 @@ export default async function ResumePage({ params }: { params: Promise<{ id: str
 
   return (
     <ResumeEditor
-      initialResume={resume}
+      initialResume={JSON.parse(JSON.stringify(resume))}
       initialCoverLetters={JSON.parse(JSON.stringify(coverLetters))}
       initialAtsAnalyses={JSON.parse(JSON.stringify(atsAnalyses))}
     />
